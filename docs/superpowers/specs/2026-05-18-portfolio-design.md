@@ -66,14 +66,14 @@ portfolio/
 └── .nojekyll                                   # Disable Jekyll on GitHub Pages
 ```
 
-Four content pages total: home, PhishGuard case study, blog index, two sample blog posts.
+Five content pages total: home, PhishGuard case study, blog index, two sample blog posts. Plus a themed 404.
 
 ## 6. Homepage sections (top → bottom)
 
 | # | Section          | Content                                                                                                                                                                                                                          |
 | - | ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1 | Hero             | Sticky nav. Animated network background. Status pill ("● Available for opportunities"). `$ whoami` terminal accent. H1 name + gradient period. Tagline from resume summary. Location ("Ottawa, Canada · Open to remote"). 2 CTAs: **View Work** → scroll to projects; **Download Resume** → PDF. |
-| 2 | About / Impact   | 2-3 sentence pitch derived from resume summary. Four stat tiles: `MTTD ↓ 30%`, `Resolution ↓ 25%`, `Phish Triage ↓ 40%`, `1000+ Tickets`. Each tile has a small uppercase label, large number, and 1-line description.            |
+| 1 | Hero             | Sticky nav. Animated network background. Status pill ("● Available for opportunities"). `$ whoami` terminal accent. H1 name + gradient period. Tagline from resume summary. Location ("Ottawa, Canada · Open to remote"). 2 CTAs: **View Work** → scroll to projects; **Download Resume** → PDF. Four stat tiles below the CTAs: `MTTD ↓ 30%`, `Resolution ↓ 25%`, `Phish Triage ↓ 40%`, `1000+ Tickets` — each with a small uppercase label, large number, and 1-line description. |
+| 2 | About            | 2-3 sentence pitch derived from resume summary, framed around detection engineering and automation. Visual rhythm break between hero and projects.                                                                                       |
 | 3 | Selected Projects| Grid: PhishGuard Pro as a **wide hero card** spanning two columns (links to `phishguard.html`), plus three smaller cards for N8n+OpenVAS pipeline, Phishing email triage pipeline, Password tooling trio. Each card has thumbnail/diagram, name, 1-line description, tech tags, "View →" link or "Case study →" for PhishGuard. |
 | 4 | Experience       | Vertical timeline. Three entries: dayOneCyber SOC Analyst (Jun 2024 – Present), dayOneCyber SOC Intern (Dec 2023 – Jun 2024), LEARNSMASHER Cybersecurity Intern (Apr 2023 – May 2023). Each item shows role, company, dates, and 3-5 bullet wins. Lifted verbatim from resume.                                                                  |
 | 5 | Skills           | Four-column block (collapses to 2 then 1 on smaller screens). Categories: **Security Operations**, **Tools & Technologies**, **Technical Expertise**, **Frameworks & Best Practices**. Pill tags only — no skill bars.                              |
