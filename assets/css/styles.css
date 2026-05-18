@@ -92,9 +92,19 @@ code, .mono { font-family: var(--font-mono); }
   color: var(--primary);
   text-transform: uppercase;
   margin-bottom: 16px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
 }
-.section-label::before { content: "// "; opacity: 0.6; }
+.section-label::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--primary);
+  box-shadow: 0 0 10px var(--primary);
+}
 
 .subtitle { font-size: 18px; color: var(--text-muted); }
 
@@ -649,6 +659,15 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   font-family: var(--font-mono);
   font-size: 12px;
   color: var(--accent);
+}
+.contact-success {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--primary);
+  padding: 10px 12px;
+  background: color-mix(in srgb, var(--primary) 8%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary) 30%, transparent);
+  border-radius: var(--radius-sm);
 }
 .contact-direct h3 { font-size: 18px; margin-bottom: 16px; }
 .contact-direct ul li {

@@ -47,7 +47,7 @@
 
     <section class="container case-header">
       <a class="case-back" href="/">← Back to portfolio</a>
-      <span class="section-label">case study · 2026</span>
+      <span class="section-label">Case study · 2026</span>
       <h1 style="margin-bottom:16px">PhishGuard Pro.</h1>
       <p class="case-tagline">Automated phishing email analysis with 25 modules, MITRE ATT&amp;CK mapping for 31 techniques, and STIX 2.1 export for SIEM/SOAR integration.</p>
       <div class="tag-row">
@@ -69,14 +69,14 @@
     </section>
 
     <section class="container prose">
-      <span class="section-label">the problem</span>
+      <span class="section-label">The problem</span>
       <h2 style="margin-bottom:16px">Phishing triage is expensive.</h2>
       <p>In a SOC, suspicious-email tickets are one of the most common — and one of the most under-tooled — workflows. Analysts paste headers into a notepad, walk through URL extraction by hand, pivot through WHOIS lookups, scan attachments through one engine after another, and only then start writing up findings.</p>
       <p>At dayOneCyber, I built an internal triage pipeline that cut investigation time by <strong>40%</strong>. But it was bespoke to our environment. PhishGuard Pro is the open, more rigorous version: <strong>25 specialized analyzers</strong> that run in parallel, modern-threat detection built in (BitB, AiTM, OAuth consent phishing, phishing-kit fingerprinting), and a SIEM/SOAR-ready export so the analyst's work doesn't end at "yes it's phishing."</p>
     </section>
 
     <section class="container prose">
-      <span class="section-label">the approach</span>
+      <span class="section-label">The approach</span>
       <h2 style="margin-bottom:16px">Six phases, one report.</h2>
       <p>Every email runs through six pipeline phases. Each phase is independent — modules add findings to a shared report, the pipeline never blocks waiting for an external API, and any phase can be disabled at runtime.</p>
 
@@ -115,7 +115,7 @@
     </section>
 
     <section class="container">
-      <span class="section-label">highlighted modules</span>
+      <span class="section-label">Modules</span>
       <h2 style="margin-bottom:32px">Five that matter most.</h2>
 
       <div class="module-grid">
@@ -148,14 +148,14 @@
     </section>
 
     <section class="container prose">
-      <span class="section-label">architecture</span>
+      <span class="section-label">Architecture</span>
       <h2 style="margin-bottom:16px">Stack.</h2>
       <p><strong>Flask</strong> serves the analyzer UI and orchestrates the pipeline. <strong>SQLite</strong> stores accounts and per-analysis history. The 25 analyzers live under <code>analyzers/</code>; each is a standalone module with a uniform <code>analyze(email)</code> interface so a new analyzer can be added by dropping in a file.</p>
       <p>External API calls (<strong>VirusTotal</strong>, <strong>urlscan.io</strong>, <strong>Anthropic Claude</strong>) are all <strong>optional</strong> — the pipeline gracefully skips a phase if an API key isn't configured. Auth uses Flask sessions with <code>pbkdf2:sha256</code> password hashing (a workaround for Python 3.9 + LibreSSL where <code>hashlib.scrypt</code> isn't available).</p>
     </section>
 
     <section class="container prose">
-      <span class="section-label">lessons learned</span>
+      <span class="section-label">Lessons learned</span>
       <h2 style="margin-bottom:24px">What this project taught me.</h2>
       <ul class="lessons">
         <li><strong>Threading hides errors.</strong> The first version of <code>ai_analyzer</code> ran Claude calls in a thread and silently swallowed timeouts. Replacing the thread with a direct SDK call and explicit handlers for <code>AuthenticationError</code>, <code>RateLimitError</code>, <code>APITimeoutError</code>, and <code>APIConnectionError</code> made failures visible and actionable.</li>

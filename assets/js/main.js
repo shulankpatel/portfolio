@@ -80,14 +80,7 @@ const PortfolioNav = (() => {
 
 /* ---- Contact form ---- */
 const PortfolioContact = (() => {
-  const EMAIL = 'shulankpatel88@gmail.com';
   const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-  function buildMailto(to, subject, message, fromName) {
-    const body = fromName ? `${message}\n\n— ${fromName}` : message;
-    const params = new URLSearchParams({ subject, body });
-    return `mailto:${to}?${params.toString().replace(/\+/g, '%20')}`;
-  }
 
   function validateContact({ name, email, message }) {
     const errors = {};
@@ -99,7 +92,7 @@ const PortfolioContact = (() => {
   }
 
   function handleSubmit(form) {
-    return (e) => {
+    return async (e) => {
       e.preventDefault();
       const data = {
         name: form.elements.name.value,
@@ -107,6 +100,14 @@ const PortfolioContact = (() => {
         message: form.elements.message.value,
       };
       const errorBox = form.querySelector('[data-error]');
+      const successBox = form.querySelector('[data-success]');
+      const submitBtn = form.querySelector('[data-submit-btn]');
+
+      // Reset state
+      errorBox.hidden = true;
+      successBox.hidden = true;
+
+      // Client-side validation
       const result = validateContact(data);
       if (!result.ok) {
         const first = Object.keys(result.errors)[0];
@@ -114,10 +115,43 @@ const PortfolioContact = (() => {
         errorBox.hidden = false;
         return;
       }
-      errorBox.hidden = true;
-      const subject = `Portfolio contact — ${data.name}`;
-      const url = buildMailto(EMAIL, subject, data.message, data.name);
-      window.location.href = url;
+
+      // Refuse to submit if the form action still has the placeholder
+      if (!form.action || form.action.includes('YOUR_FORMSPREE_ID')) {
+        errorBox.textContent = 'Form not yet configured. Please email directly using the link below.';
+        errorBox.hidden = false;
+        return;
+      }
+
+      submitBtn.disabled = true;
+      const originalLabel = submitBtn.textContent;
+      submitBtn.textContent = 'Sending…';
+
+      try {
+        const response = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+          body: JSON.stringify(data),
+        });
+
+        if (response.ok) {
+          form.reset();
+          successBox.textContent = "Thanks — message sent. I'll reply soon.";
+          successBox.hidden = false;
+        } else {
+          const json = await response.json().catch(() => ({}));
+          const msg = (json.errors && json.errors[0] && json.errors[0].message)
+            || 'Submission failed. Please try emailing directly.';
+          errorBox.textContent = msg;
+          errorBox.hidden = false;
+        }
+      } catch (_) {
+        errorBox.textContent = 'Network error. Please try emailing directly.';
+        errorBox.hidden = false;
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalLabel;
+      }
     };
   }
 
@@ -127,7 +161,7 @@ const PortfolioContact = (() => {
     form.addEventListener('submit', handleSubmit(form));
   }
 
-  return { buildMailto, validateContact, init };
+  return { validateContact, init };
 })();
 
 document.addEventListener('DOMContentLoaded', () => {

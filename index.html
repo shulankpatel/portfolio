@@ -97,7 +97,7 @@
     </section>
 
     <section class="about container" id="about">
-      <span class="section-label">section 01 — about</span>
+      <span class="section-label">About</span>
       <h2>Detection meets automation.</h2>
       <p>
         I'm a <strong>SOC Analyst at dayOneCyber</strong> with two years of hands-on experience in threat detection, incident response, and vulnerability management. I work mostly in Microsoft 365 Defender (XDR), and I lean heavily on automation — N8n workflows, Python pipelines, and SIEM/SOAR integrations — to cut response times and free up human attention for the things that actually need it.
@@ -105,7 +105,7 @@
     </section>
 
     <section class="container" id="projects">
-      <span class="section-label">section 02 — selected projects</span>
+      <span class="section-label">Selected projects</span>
       <h2 style="margin-bottom:32px">Selected work.</h2>
 
       <div class="projects-grid">
@@ -157,7 +157,7 @@
     </section>
 
     <section class="container" id="experience">
-      <span class="section-label">section 03 — experience</span>
+      <span class="section-label">Experience</span>
       <h2 style="margin-bottom:32px">Where I've worked.</h2>
 
       <div class="timeline">
@@ -213,7 +213,7 @@
     </section>
 
     <section class="container" id="skills">
-      <span class="section-label">section 04 — skills</span>
+      <span class="section-label">Skills</span>
       <h2 style="margin-bottom:32px">Toolkit.</h2>
 
       <div class="skills-grid">
@@ -264,7 +264,7 @@
     </section>
 
     <section class="container" id="education">
-      <span class="section-label">section 05 — education &amp; certifications</span>
+      <span class="section-label">Education &amp; certifications</span>
       <h2 style="margin-bottom:32px">Learning.</h2>
 
       <div class="edu-cert">
@@ -304,7 +304,7 @@
     </section>
 
     <section class="container" id="writing">
-      <span class="section-label">section 06 — writing</span>
+      <span class="section-label">Writing</span>
       <h2 style="margin-bottom:8px">Notes from the SOC.</h2>
       <p style="margin-bottom:32px;color:var(--text-muted)">Long-form notes on detection, automation, and modern phishing threats.</p>
 
@@ -331,12 +331,12 @@
     </section>
 
     <section class="container" id="contact">
-      <span class="section-label">section 07 — contact</span>
+      <span class="section-label">Contact</span>
       <h2 style="margin-bottom:8px">Get in touch.</h2>
-      <p style="margin-bottom:32px;color:var(--text-muted)">Open to SOC Analyst, Detection Engineer, and Security Automation roles. The form opens your mail client — or skip it and reach me directly below.</p>
+      <p style="margin-bottom:32px;color:var(--text-muted)">Open to SOC Analyst, Detection Engineer, and Security Automation roles. Fill in the form or reach me directly below.</p>
 
       <div class="contact-grid">
-        <form class="contact-form" data-contact-form novalidate>
+        <form class="contact-form" data-contact-form action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" novalidate>
           <div>
             <label for="contact-name">Name</label>
             <input id="contact-name" name="name" type="text" required autocomplete="name">
@@ -349,8 +349,9 @@
             <label for="contact-message">Message</label>
             <textarea id="contact-message" name="message" required></textarea>
           </div>
-          <p class="contact-error" data-error hidden></p>
-          <button type="submit" class="btn btn-primary">Send via email →</button>
+          <p class="contact-error" data-error hidden role="alert"></p>
+          <p class="contact-success" data-success hidden role="status"></p>
+          <button type="submit" class="btn btn-primary" data-submit-btn>Send message →</button>
         </form>
 
         <div class="contact-direct">

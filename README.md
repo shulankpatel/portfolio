@@ -44,6 +44,23 @@ The portfolio's JS modules are covered by an in-browser test runner — no npm, 
 └── README.md
 ```
 
+## Wire up the contact form (Formspree)
+
+The contact form posts to [Formspree](https://formspree.io) — free tier handles 50 submissions/month, no backend needed. To activate it:
+
+1. Sign up at <https://formspree.io> with `shulankpatel88@gmail.com`.
+2. Create a new form. Formspree gives you an endpoint URL like `https://formspree.io/f/xpzgnqva`.
+3. Copy the form ID (the part after `/f/` — e.g., `xpzgnqva`).
+4. In `index.html`, find the line:
+   ```
+   <form class="contact-form" data-contact-form action="https://formspree.io/f/YOUR_FORMSPREE_ID" method="POST" novalidate>
+   ```
+   Replace `YOUR_FORMSPREE_ID` with your form ID.
+5. Confirm your email through Formspree's verification link (one click).
+6. Submit a test message from the live site. It should arrive at your inbox within seconds and the form should show an inline "Thanks — message sent." confirmation.
+
+Until step 4 is done, the form will refuse to submit and show an inline note pointing visitors at the direct email link instead.
+
 ## Pre-deploy QA checklist
 
 Run these manual checks before publishing. The site is small enough that 10 minutes is enough:
@@ -53,7 +70,7 @@ Run these manual checks before publishing. The site is small enough that 10 minu
 - [ ] Lighthouse (Chrome DevTools → Lighthouse, Mobile) scores ≥ 95 on Performance, Accessibility, Best Practices, and SEO for both `index.html` and `phishguard.html`.
 - [ ] Theme toggle (☾ / ☀) flips dark ↔ light and persists across page reloads and navigation between pages.
 - [ ] Resume button downloads `Shulank_Patel_Resume.pdf` from both the nav and the hero.
-- [ ] Contact form: submitting empty shows an inline error; submitting valid input opens the user's mail client with the pre-filled subject and body.
+- [ ] Contact form: submitting empty shows an inline error; submitting valid input (after wiring Formspree) shows an inline "Thanks — message sent." confirmation and arrives in your inbox.
 - [ ] Mobile drawer (☰) opens/closes correctly under 1024 px and locks body scroll when open.
 - [ ] Skip-to-content link appears as the first focusable element on Tab.
 - [ ] All 11 in-browser tests at `/tests/test-runner.html` PASS.
