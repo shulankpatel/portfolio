@@ -9,7 +9,6 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
-  <script src="assets/js/main.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to content</a>
@@ -46,10 +45,11 @@
   </div>
 
   <main id="main">
-    <section class="container">
-      <span class="section-label">section 00 — nav + footer preview</span>
-      <h2>Nav + footer scaffold</h2>
-      <p>Replace this once hero is built.</p>
+    <section class="hero">
+      <canvas id="network-bg" aria-hidden="true"></canvas>
+      <div class="hero-inner" style="min-height:400px;display:flex;align-items:center">
+        <h2>Network animation preview</h2>
+      </div>
     </section>
   </main>
 
@@ -59,5 +59,7 @@
       <div class="mono">tactical_midnight v1</div>
     </div>
   </footer>
+  <script src="assets/js/main.js" defer></script>
+  <script src="assets/js/network-bg.js" defer></script>
 </body>
 </html>
