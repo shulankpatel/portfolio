@@ -48,11 +48,11 @@
   --text-primary: #0f172a;
   --text-muted: #475569;
   --text-dim: #64748b;
-  --primary: #0284c7;
-  --primary-deep: #0369a1;
+  --primary: #0369a1;
+  --primary-deep: #075985;
   --accent: #ea580c;
-  --gradient: linear-gradient(135deg, #0284c7 0%, #0369a1 50%, #075985 100%);
-  --shadow-glow: 0 0 24px rgba(2, 132, 199, 0.15);
+  --gradient: linear-gradient(135deg, #0369a1 0%, #075985 50%, #0c4a6e 100%);
+  --shadow-glow: 0 0 24px rgba(3, 105, 161, 0.15);
 }
 
 /* ============ 2. RESET ============ */

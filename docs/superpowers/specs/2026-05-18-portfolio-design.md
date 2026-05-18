@@ -132,7 +132,7 @@ Single deep-dive page at `phishguard.html`:
 | `--text-primary`   | `#0f172a`  |
 | `--text-muted`     | `#475569`  |
 | `--text-dim`       | `#64748b`  |
-| `--primary`        | `#0284c7`  |
+| `--primary`        | `#0369a1`  |
 | `--accent`         | `#ea580c`  |
 
 ### Typography
