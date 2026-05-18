@@ -1,2 +1,119 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>Placeholder</title></head><body></body></html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building PhishGuard Pro — Shulank Patel</title>
+  <meta name="description" content="Behind the scenes of PhishGuard Pro: a 25-module phishing analysis pipeline with MITRE mapping and STIX 2.1 export.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="/" class="nav-logo">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 2 L28 7 V16 C28 22 22 28 16 30 C10 28 4 22 4 16 V7 Z" stroke="currentColor" stroke-width="2" fill="rgba(34,211,238,0.08)"/>
+        <circle cx="16" cy="15" r="3" fill="currentColor"/>
+        <path d="M16 18 V23" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span>SHULANK<span class="dot">.</span>PATEL</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#projects">Projects</a></li>
+      <li><a href="/#experience">Experience</a></li>
+      <li><a href="/blog/" aria-current="page">Writing</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">☾</button>
+      <a class="btn btn-primary" href="../assets/resume/Shulank_Patel_Resume.pdf" download>Resume ↓</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+  </nav>
+
+  <div class="mobile-drawer" data-mobile-drawer aria-hidden="true">
+    <a href="/#projects">Projects</a>
+    <a href="/#experience">Experience</a>
+    <a href="/blog/">Writing</a>
+    <a href="/#contact">Contact</a>
+  </div>
+
+  <main id="main">
+    <article class="post">
+      <header class="post-hero">
+        <a class="case-back" href="./">← All writing</a>
+        <h1>Building PhishGuard Pro</h1>
+        <div class="post-meta">Case Study · 12 min read · May 2026</div>
+      </header>
+
+      <div class="post-body">
+        <p>SOC tickets for "is this email phishing?" come in by the dozen. The work itself is repetitive — extract URLs, walk WHOIS, check reputation, scan the attachment, write up findings — but every triage is just different enough that automation feels hard. I wanted to find out how far I could push it.</p>
+
+        <h2>The motivation</h2>
+        <p>At dayOneCyber, I built an internal triage pipeline that cut phishing investigation time by <strong>40%</strong>. That pipeline was bespoke to our tooling, our M365 environment, and our SOC's reporting format. I wanted a more rigorous, open version that anyone running a SOC could pick up — and a place to push back on the limits of what "automated phishing analysis" usually means.</p>
+        <p>Most open tools stop at the obvious indicators: links, attachments, WHOIS, basic SPF/DKIM/DMARC. PhishGuard Pro adds the modern-threat layer that most tooling still misses: <strong>Browser-in-the-Browser</strong>, <strong>AiTM proxies</strong> (Tycoon 2FA, Evilginx2), <strong>OAuth consent phishing</strong>, <strong>phishing-kit fingerprinting</strong>, and <strong>AI-generated content detection</strong>.</p>
+
+        <h2>Six phases, one report</h2>
+        <p>Every email runs through six pipeline phases. Modules within each phase are independent — they each append findings to a shared report object and never block each other.</p>
+        <ol>
+          <li><strong>Core</strong> — header parsing, URL extraction, attachment scan, sender reputation, content rules.</li>
+          <li><strong>Enrichment</strong> — WHOIS, IP geolocation, QR-code decoding, PDF text + link extraction.</li>
+          <li><strong>Modern Threats</strong> — redirect chain resolution, OAuth scope analysis, BitB and AiTM heuristics, DNS/SSL inspection, phishing-kit fingerprinting, language/locale mismatch.</li>
+          <li><strong>MITRE + IOC</strong> — mapping findings to ATT&amp;CK techniques and bundling IOCs.</li>
+          <li><strong>External APIs</strong> (optional) — VirusTotal, urlscan.io, Anthropic Claude for cross-signal analysis.</li>
+          <li><strong>Intelligence</strong> — sandbox detonation hooks, community DB lookups, threat-actor attribution.</li>
+        </ol>
+
+        <h2>Why modern-threat modules deserve their own files</h2>
+        <p>Generic content-rule engines miss the threats that actually matter in 2026. <code>bitb_analyzer.py</code> looks for the specific DOM and CSS fingerprints that BitB kits use to render fake login windows inside the page itself. <code>campaign_analyzer.py</code> simhashes the template against known phishing kit templates (Tycoon 2FA, Evilginx2, W3LL) so an analyst sees <em>which</em> kit they're up against, not just "suspicious page." <code>oauth_analyzer.py</code> reads the consent URL's requested scopes and flags anything beyond what's necessary — the high-leverage signal in OAuth consent abuse (<code>T1528</code>).</p>
+        <p>Splitting these into named modules instead of bolting them onto <code>content_analyzer.py</code> keeps the logic legible and lets each detector evolve independently as the threat landscape shifts.</p>
+
+        <h2>The LLM is a synthesizer, not the detector</h2>
+        <p>The first version put Claude in front of every email and asked "is this phishing?" That works, but it's a single-signal model and you're paying per email. The better design — and the one I shipped — feeds the LLM the <strong>existing report</strong> after the deterministic modules have run, and asks it for a cross-signal narrative: which findings point in the same direction, which look contradictory, and what the most likely classification is.</p>
+        <p>That role swap turned <code>ai_analyzer.py</code> from "the detector" into "the analyst who explains the report." Cost dropped, accuracy went up, and the output is something an SOC writer can drop directly into a ticket.</p>
+
+        <h2>What the threading bug taught me</h2>
+        <p>The first version of <code>ai_analyzer</code> ran Claude calls in a <code>threading.Thread</code> with a queue for results. It was silently swallowing timeouts — the report would come back without the AI analysis section and no error in the logs. I replaced the thread with a direct SDK call and explicit handlers for each Anthropic exception type:</p>
+        <pre><code>from anthropic import (
+    Anthropic, AuthenticationError, RateLimitError,
+    APITimeoutError, APIConnectionError,
+)
+
+client = Anthropic(api_key=key, timeout=60.0)
+try:
+    resp = client.messages.create(...)
+except AuthenticationError:
+    return {"error": "invalid_api_key"}
+except RateLimitError:
+    return {"error": "rate_limited"}
+except APITimeoutError:
+    return {"error": "timeout"}
+except APIConnectionError:
+    return {"error": "connection"}</code></pre>
+        <p>The lesson stuck: when you wrap something in a thread, you opt out of the framework's default error visibility. If you don't replace it with something explicit, you've built a silent-failure machine.</p>
+
+        <h2>STIX export was the highest-leverage feature</h2>
+        <p>The most useful thing PhishGuard Pro does isn't the analysis itself — it's making the analysis <strong>reusable downstream</strong>. The <code>ioc_extractor</code> bundles every IOC (URLs, IPs, domains, hashes, sender emails) into a STIX 2.1 document. Drop it into a SIEM, a SOAR playbook, or a threat-intel platform, and you've turned a single email triage into permanent detection content.</p>
+        <p>One email becomes one investigation. With STIX export, one email becomes a set of detections that catch the next twenty.</p>
+
+        <h2>What's next</h2>
+        <p>I want to ship a streaming mode where modules emit findings to the UI as they finish, instead of waiting for the full report. I also want to formalize the analyzer interface as a proper plugin protocol so third parties can drop in their own modules. And I'm exploring whether the cross-signal layer can replay against historical reports to surface campaigns that span multiple emails — closer to a real campaign-tracking tool.</p>
+
+        <p style="margin-top:48px"><a href="./" class="project-link">All writing</a></p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-row">
+      <div>© 2026 Shulank Patel. Built with vanilla HTML/CSS/JS.</div>
+      <div class="mono">tactical_midnight v1</div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,2 +1,108 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"><title>Placeholder</title></head><body></body></html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Detecting Browser-in-the-Browser attacks — Shulank Patel</title>
+  <meta name="description" content="How BitB and AiTM kits weaponize fake login windows — and the heuristics PhishGuard Pro uses to catch them.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/styles.css">
+  <script src="../assets/js/main.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="/" class="nav-logo">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 2 L28 7 V16 C28 22 22 28 16 30 C10 28 4 22 4 16 V7 Z" stroke="currentColor" stroke-width="2" fill="rgba(34,211,238,0.08)"/>
+        <circle cx="16" cy="15" r="3" fill="currentColor"/>
+        <path d="M16 18 V23" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span>SHULANK<span class="dot">.</span>PATEL</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="/#projects">Projects</a></li>
+      <li><a href="/#experience">Experience</a></li>
+      <li><a href="/blog/" aria-current="page">Writing</a></li>
+      <li><a href="/#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">☾</button>
+      <a class="btn btn-primary" href="../assets/resume/Shulank_Patel_Resume.pdf" download>Resume ↓</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+  </nav>
+
+  <div class="mobile-drawer" data-mobile-drawer aria-hidden="true">
+    <a href="/#projects">Projects</a>
+    <a href="/#experience">Experience</a>
+    <a href="/blog/">Writing</a>
+    <a href="/#contact">Contact</a>
+  </div>
+
+  <main id="main">
+    <article class="post">
+      <header class="post-hero">
+        <a class="case-back" href="./">← All writing</a>
+        <h1>Detecting Browser-in-the-Browser attacks</h1>
+        <div class="post-meta">Technical · 8 min read · May 2026</div>
+      </header>
+
+      <div class="post-body">
+        <p>A Browser-in-the-Browser (BitB) attack does something unsettlingly simple: it renders a <em>fake browser window</em> inside the phishing page. From the user's perspective, they clicked "Sign in with Microsoft," a Microsoft login popup appeared, they typed their credentials, and the page proceeded as expected. From the page's perspective, no popup ever opened. The "window" was a <code>&lt;div&gt;</code>.</p>
+
+        <h2>Why BitB works</h2>
+        <p>Users have been trained for two decades to trust the chrome around a window — the URL bar, the lock icon, the title bar. BitB kits draw all of that. They give you a pixel-perfect fake of the Microsoft, Google, or Okta sign-in popup, with a fake URL bar showing <code>login.microsoftonline.com</code>, a fake padlock, and a draggable header. It's all CSS and a few hundred lines of JavaScript. The credentials go to the attacker's server. The user never leaves the malicious page.</p>
+        <p>AiTM (adversary-in-the-middle) is the closely-related cousin: instead of faking the login window, the attacker proxies the real login flow through their own server — Evilginx2 and Tycoon 2FA are the well-known kits. The user sees a legitimate-looking Microsoft login, types their password, completes MFA, and the attacker captures the resulting session cookie. From the user's perspective, login worked.</p>
+
+        <h2>The detection problem</h2>
+        <p>Traditional phishing detection looks at: the sender's reputation, the URL's age, the page's content (suspicious words, branding lifted from a real company), and credential-form heuristics. BitB and AiTM defeat most of those:</p>
+        <ul>
+          <li>The sender can be a legitimate compromised account.</li>
+          <li>The URL might be new but not <em>obviously</em> bad.</li>
+          <li>The page's content mostly looks normal — the malicious part is a popup that only renders on click.</li>
+          <li>The credential form is real. AiTM passes it straight to the real site.</li>
+        </ul>
+
+        <h2>BitB fingerprints</h2>
+        <p>Most BitB kits share structural fingerprints because they're all copies of a few well-known templates. <code>bitb_analyzer.py</code> walks the DOM looking for:</p>
+        <ol>
+          <li><strong>Window-chrome div</strong> — a parent container with a child element styled to look like a browser title bar (specific gradient backgrounds, height ~32px, draggable handlers, a fake close-X SVG).</li>
+          <li><strong>Fake URL bar text</strong> — a text element styled in monospace that contains an exact-match string for a major login URL (<code>login.microsoftonline.com</code>, <code>accounts.google.com</code>, <code>login.okta.com</code>) but is <em>not</em> an <code>&lt;input&gt;</code> or part of the actual location bar.</li>
+          <li><strong>Lock icon SVG inline</strong> — most kits inline the same lock SVG path. A simhash against known BitB SVG fingerprints catches this cheaply.</li>
+          <li><strong>Drag handler bound to mousemove</strong> — the fake window is draggable. The JavaScript binds <code>mousedown</code> + <code>mousemove</code> handlers to a container that <em>also</em> contains a credential form.</li>
+          <li><strong>Credential form inside the draggable container</strong> — this is the smoking gun. Real browser popups don't contain DOM-level credential forms because they <em>are</em> browser popups, not DOM elements.</li>
+        </ol>
+
+        <h2>AiTM fingerprints</h2>
+        <p>AiTM doesn't have BitB's DOM tells because the page <em>is</em> the real login page, served through a reverse proxy. The fingerprints are at the network layer:</p>
+        <ol>
+          <li><strong>Hostname doesn't match the login flow's expected domain.</strong> Microsoft 365 login lives at <code>login.microsoftonline.com</code>. If the credential form is on <code>login-microsoft.example-vps.io</code>, that's the proxy hostname leaking.</li>
+          <li><strong>TLS certificate is recently issued, often Let's Encrypt, often valid for only one hostname.</strong> Real login services use long-lived enterprise certs.</li>
+          <li><strong>Page assets load from two different origins</strong> — most from the real Microsoft CDN, some (the proxy's injection script) from the attacker's domain.</li>
+          <li><strong>WAF / bot-protection cloaking</strong> — many AiTM kits cloak the phishing page from automated scanners (Cloudflare CAPTCHA gate, IP-range blocks against research scanners). PhishGuard's <code>redirect_analyzer</code> catches this by detecting the cloaking response.</li>
+        </ol>
+
+        <h2>Why this matters for SOC tickets</h2>
+        <p>When a user reports a suspicious email, the analyst's first move is usually to click the link in a sandboxed browser and look at the page. If the analyst doesn't know to look for BitB-specific tells, they'll write off the page as "suspicious but no credential harvest observed" — when in fact the kit was waiting for a user click to render the fake popup, and the page itself is innocuous.</p>
+        <p>Automating this detection in the triage pipeline means the BitB / AiTM judgement happens before the analyst opens the email, with the fingerprints already cited in the report. The analyst's job becomes deciding what to do about it, not whether it's there.</p>
+
+        <h2>What still goes wrong</h2>
+        <p>Detection isn't free of false positives. Some legitimate apps render their own draggable windows for accessibility tooling. Some legitimate proxies (corporate SSO, identity-broker products) look statistically similar to AiTM at the TLS layer. The current heuristics are tuned for high recall and moderate precision — the analyst is still the final judge. The right next step is a labeled training corpus to push precision up without surrendering recall.</p>
+
+        <p style="margin-top:48px"><a href="./" class="project-link">All writing</a></p>
+      </div>
+    </article>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-row">
+      <div>© 2026 Shulank Patel. Built with vanilla HTML/CSS/JS.</div>
+      <div class="mono">tactical_midnight v1</div>
+    </div>
+  </footer>
+</body>
+</html>
