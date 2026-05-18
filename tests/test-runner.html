@@ -78,6 +78,37 @@
       assertTrue(t === 'dark' || t === 'light', `getInitialTheme returned ${t}`);
     });
 
+    // === Contact form ===
+    test('buildMailto generates correct base URL', () => {
+      const url = PortfolioContact.buildMailto('me@example.com', 'Hello', 'World');
+      assertTrue(url.startsWith('mailto:me@example.com'), `got ${url}`);
+    });
+
+    test('buildMailto URL-encodes subject and body', () => {
+      const url = PortfolioContact.buildMailto('me@example.com', 'Hi there!', 'Line 1\nLine 2 & friends');
+      assertTrue(url.includes('subject=Hi%20there!'), 'subject should be encoded');
+      assertTrue(url.includes('Line%201%0ALine%202%20%26%20friends'), 'body should be encoded');
+    });
+
+    test('buildMailto includes sender name in body', () => {
+      const url = PortfolioContact.buildMailto('me@example.com', 'Subject', 'Message', 'Jane Doe');
+      assertTrue(url.includes('Jane%20Doe'), 'sender name should appear in encoded body');
+    });
+
+    test('validateContact rejects empty fields', () => {
+      assertEq(PortfolioContact.validateContact({ name: '', email: 'a@b.com', message: 'hi' }).ok, false);
+      assertEq(PortfolioContact.validateContact({ name: 'x', email: '', message: 'hi' }).ok, false);
+      assertEq(PortfolioContact.validateContact({ name: 'x', email: 'a@b.com', message: '' }).ok, false);
+    });
+
+    test('validateContact accepts complete input', () => {
+      assertEq(PortfolioContact.validateContact({ name: 'Jane', email: 'jane@example.com', message: 'Hi' }).ok, true);
+    });
+
+    test('validateContact rejects malformed email', () => {
+      assertEq(PortfolioContact.validateContact({ name: 'x', email: 'not-an-email', message: 'hi' }).ok, false);
+    });
+
     summary.textContent = `Total: ${passed + failed}  •  Passed: ${passed}  •  Failed: ${failed}`;
     summary.className = 'summary ' + (failed === 0 ? 'pass' : 'fail');
   </script>

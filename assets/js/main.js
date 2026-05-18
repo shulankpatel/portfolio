@@ -78,7 +78,60 @@ const PortfolioNav = (() => {
   return { init };
 })();
 
+/* ---- Contact form ---- */
+const PortfolioContact = (() => {
+  const EMAIL = 'shulankpatel88@gmail.com';
+  const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  function buildMailto(to, subject, message, fromName) {
+    const body = fromName ? `${message}\n\n— ${fromName}` : message;
+    const params = new URLSearchParams({ subject, body });
+    return `mailto:${to}?${params.toString().replace(/\+/g, '%20')}`;
+  }
+
+  function validateContact({ name, email, message }) {
+    const errors = {};
+    if (!name || !name.trim()) errors.name = 'Required';
+    if (!email || !email.trim()) errors.email = 'Required';
+    else if (!EMAIL_RE.test(email)) errors.email = 'Invalid email';
+    if (!message || !message.trim()) errors.message = 'Required';
+    return { ok: Object.keys(errors).length === 0, errors };
+  }
+
+  function handleSubmit(form) {
+    return (e) => {
+      e.preventDefault();
+      const data = {
+        name: form.elements.name.value,
+        email: form.elements.email.value,
+        message: form.elements.message.value,
+      };
+      const errorBox = form.querySelector('[data-error]');
+      const result = validateContact(data);
+      if (!result.ok) {
+        const first = Object.keys(result.errors)[0];
+        errorBox.textContent = `${first}: ${result.errors[first]}`;
+        errorBox.hidden = false;
+        return;
+      }
+      errorBox.hidden = true;
+      const subject = `Portfolio contact — ${data.name}`;
+      const url = buildMailto(EMAIL, subject, data.message, data.name);
+      window.location.href = url;
+    };
+  }
+
+  function init() {
+    const form = document.querySelector('[data-contact-form]');
+    if (!form) return;
+    form.addEventListener('submit', handleSubmit(form));
+  }
+
+  return { buildMailto, validateContact, init };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   PortfolioTheme.init();
   PortfolioNav.init();
+  PortfolioContact.init();
 });
