@@ -1,2 +1,85 @@
 <!DOCTYPE html>
-<html><head><title>Tests</title></head><body><pre id="r">Tests not implemented yet.</pre></body></html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Test Runner</title>
+  <style>
+    body { font-family: -apple-system, system-ui, monospace; padding: 24px; background: #0a1628; color: #e2e8f0; }
+    h1 { color: #22d3ee; margin-bottom: 16px; }
+    .pass { color: #22c55e; }
+    .fail { color: #ef4444; }
+    pre { white-space: pre-wrap; background: #04080f; padding: 16px; border-radius: 6px; border: 1px solid #1e3a52; }
+    .summary { margin-top: 16px; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <h1>Portfolio test runner</h1>
+  <pre id="results"></pre>
+  <div class="summary" id="summary"></div>
+
+  <script src="../assets/js/main.js"></script>
+  <script>
+    const out = document.getElementById('results');
+    const summary = document.getElementById('summary');
+    let passed = 0, failed = 0;
+
+    function test(name, fn) {
+      try {
+        fn();
+        out.innerHTML += `<span class="pass">PASS</span>  ${name}\n`;
+        passed++;
+      } catch (e) {
+        out.innerHTML += `<span class="fail">FAIL</span>  ${name}\n        ${e.message}\n`;
+        failed++;
+      }
+    }
+    function assertEq(a, b, label) {
+      if (a !== b) throw new Error(`${label || ''} expected ${JSON.stringify(b)}, got ${JSON.stringify(a)}`);
+    }
+    function assertTrue(v, label) {
+      if (!v) throw new Error(`${label || 'value'} expected truthy, got ${JSON.stringify(v)}`);
+    }
+
+    // === Theme module ===
+    test('applyTheme sets data-theme on <html>', () => {
+      PortfolioTheme.applyTheme('light');
+      assertEq(document.documentElement.getAttribute('data-theme'), 'light');
+      PortfolioTheme.applyTheme('dark');
+      assertEq(document.documentElement.getAttribute('data-theme'), 'dark');
+    });
+
+    test('applyTheme persists to localStorage', () => {
+      localStorage.removeItem('pg-theme');
+      PortfolioTheme.applyTheme('light');
+      assertEq(localStorage.getItem('pg-theme'), 'light');
+      PortfolioTheme.applyTheme('dark');
+      assertEq(localStorage.getItem('pg-theme'), 'dark');
+    });
+
+    test('toggleTheme flips between dark and light', () => {
+      PortfolioTheme.applyTheme('dark');
+      PortfolioTheme.toggleTheme();
+      assertEq(document.documentElement.getAttribute('data-theme'), 'light');
+      PortfolioTheme.toggleTheme();
+      assertEq(document.documentElement.getAttribute('data-theme'), 'dark');
+    });
+
+    test('getInitialTheme prefers localStorage when set', () => {
+      localStorage.setItem('pg-theme', 'light');
+      assertEq(PortfolioTheme.getInitialTheme(), 'light');
+      localStorage.setItem('pg-theme', 'dark');
+      assertEq(PortfolioTheme.getInitialTheme(), 'dark');
+      localStorage.removeItem('pg-theme');
+    });
+
+    test('getInitialTheme returns "dark" or "light" without stored value', () => {
+      localStorage.removeItem('pg-theme');
+      const t = PortfolioTheme.getInitialTheme();
+      assertTrue(t === 'dark' || t === 'light', `getInitialTheme returned ${t}`);
+    });
+
+    summary.textContent = `Total: ${passed + failed}  •  Passed: ${passed}  •  Failed: ${failed}`;
+    summary.className = 'summary ' + (failed === 0 ? 'pass' : 'fail');
+  </script>
+</body>
+</html>
