@@ -3,21 +3,61 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Tokens sandbox</title>
+  <title>Shulank Patel — SOC Analyst</title>
+  <meta name="description" content="SOC Analyst at dayOneCyber. Detection engineering, incident response, and security automation.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="assets/css/styles.css">
+  <script src="assets/js/main.js" defer></script>
 </head>
 <body>
-  <main class="container" style="padding-top:48px;padding-bottom:48px">
-    <span class="section-label">section 00 — tokens sandbox</span>
-    <h1>Shulank Patel.</h1>
-    <h2>Section heading</h2>
-    <h3>Subsection</h3>
-    <p class="subtitle">Tagline goes here. Detection &amp; response engineer.</p>
-    <p>Body text. <a href="#">Hyperlink</a>. <code>const x = 42;</code></p>
-    <p style="color:var(--text-dim);font-family:var(--font-mono);font-size:12px">Dim monospace label.</p>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="/" class="nav-logo" aria-label="Home">
+      <svg width="22" height="22" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+        <path d="M16 2 L28 7 V16 C28 22 22 28 16 30 C10 28 4 22 4 16 V7 Z" stroke="currentColor" stroke-width="2" fill="rgba(34,211,238,0.08)"/>
+        <circle cx="16" cy="15" r="3" fill="currentColor"/>
+        <path d="M16 18 V23" stroke="currentColor" stroke-width="2"/>
+      </svg>
+      <span>SHULANK<span class="dot">.</span>PATEL</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#home" aria-current="page">Home</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="/blog/">Writing</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+    <div class="nav-cta">
+      <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">☾</button>
+      <a class="btn btn-primary" href="assets/resume/Shulank_Patel_Resume.pdf" download>Resume ↓</a>
+      <button class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false">☰</button>
+    </div>
+  </nav>
+
+  <div class="mobile-drawer" data-mobile-drawer aria-hidden="true">
+    <a href="#home">Home</a>
+    <a href="#projects">Projects</a>
+    <a href="#experience">Experience</a>
+    <a href="/blog/">Writing</a>
+    <a href="#contact">Contact</a>
+  </div>
+
+  <main id="main">
+    <section class="container">
+      <span class="section-label">section 00 — nav + footer preview</span>
+      <h2>Nav + footer scaffold</h2>
+      <p>Replace this once hero is built.</p>
+    </section>
   </main>
+
+  <footer class="footer">
+    <div class="footer-row">
+      <div>© 2026 Shulank Patel. Built with vanilla HTML/CSS/JS.</div>
+      <div class="mono">tactical_midnight v1</div>
+    </div>
+  </footer>
 </body>
 </html>

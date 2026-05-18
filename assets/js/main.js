@@ -52,6 +52,29 @@ const PortfolioTheme = (() => {
   }
 })();
 
+/* ---- Mobile nav ---- */
+const PortfolioNav = (() => {
+  function init() {
+    const toggle = document.querySelector('[data-nav-toggle]');
+    const drawer = document.querySelector('[data-mobile-drawer]');
+    if (!toggle || !drawer) return;
+    toggle.addEventListener('click', () => {
+      const open = drawer.classList.toggle('open');
+      toggle.setAttribute('aria-expanded', String(open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    });
+    drawer.addEventListener('click', (e) => {
+      if (e.target.tagName === 'A') {
+        drawer.classList.remove('open');
+        toggle.setAttribute('aria-expanded', 'false');
+        document.body.style.overflow = '';
+      }
+    });
+  }
+  return { init };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   PortfolioTheme.init();
+  PortfolioNav.init();
 });
