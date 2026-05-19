@@ -264,88 +264,450 @@ const PortfolioScroll = (() => {
   return { init };
 })();
 
-/* ---- SOC live feed (hero) ---- */
-const PortfolioFeed = (() => {
+/* ---- Polish pass: spotlight, magnetic, tilt, letter reveal, scramble ---- */
+const PortfolioPolish = (() => {
   const reduceMotion = window.matchMedia &&
     window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const isTouch = window.matchMedia && window.matchMedia('(hover: none)').matches;
 
-  // (severity, message)
-  const POOL = [
-    ['info', 'Inbound mail processed · 2,341 messages'],
-    ['warn', 'T1566.001 attachment hash matched IoC DB'],
-    ['crit', 'BitB DOM fingerprint detected · score 0.87'],
-    ['info', 'Auto-quarantine: 3 messages'],
-    ['warn', 'OAuth consent scope mismatch · flagged for review'],
-    ['crit', 'AiTM TLS pattern matched · kit: Evilginx2 v3.2'],
-    ['info', 'STIX 2.1 bundle pushed → SIEM'],
-    ['info', 'MITRE map: T1528, T1557, T1566.001'],
-    ['warn', 'urlscan.io phishing-confidence: 92%'],
-    ['crit', 'Sender impersonation · T1656 · domain age 4d'],
-    ['info', 'Analyst notification dispatched'],
-    ['info', 'Pipeline runtime 1.4s · 25/25 modules ok'],
-    ['warn', 'QR redirect resolves to credential-harvest URL'],
-    ['crit', 'Tycoon 2FA kit fingerprint · campaign_v2'],
-    ['info', 'Defender for Endpoint: alert acknowledged'],
-    ['warn', 'WHOIS · registrant privacy + 2d-old domain'],
-    ['info', 'Secure Score Δ +0.4 over rolling 7d'],
-    ['crit', 'AI-generated body detected · perplexity 13.2'],
-    ['info', 'IOC enrichment complete · 14 indicators'],
-    ['warn', 'CAPTCHA cloaking detected on redirect chain'],
-  ];
-
-  const MAX_LINES = 7;
-  const INTERVAL = 1600;
-
-  function fmtTs(d) {
-    const pad = (n) => String(n).padStart(2, '0');
-    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  function initSpotlight() {
+    if (isTouch || reduceMotion) return;
+    const hero = document.querySelector('.hero');
+    if (!hero) return;
+    hero.addEventListener('pointermove', (e) => {
+      const r = hero.getBoundingClientRect();
+      const x = ((e.clientX - r.left) / r.width) * 100;
+      const y = ((e.clientY - r.top) / r.height) * 100;
+      hero.style.setProperty('--mx', `${x}%`);
+      hero.style.setProperty('--my', `${y}%`);
+    });
   }
 
-  function lineNode(sev, msg, ts) {
-    const row = document.createElement('div');
-    row.className = 'soc-feed-line';
-    row.innerHTML =
-      `<span class="ts">${ts}</span>` +
-      `<span class="sev ${sev}">[${sev.toUpperCase()}]</span>` +
-      `<span class="msg">${msg}</span>`;
-    return row;
+  function initMagnetic() {
+    if (isTouch || reduceMotion) return;
+    const els = document.querySelectorAll('[data-magnetic]');
+    const RANGE = 90;
+    const PULL = 0.25;
+    els.forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const dx = e.clientX - cx;
+        const dy = e.clientY - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < RANGE) {
+          el.style.transform = `translate(${dx * PULL}px, ${dy * PULL}px)`;
+        }
+      });
+      el.addEventListener('pointerleave', () => {
+        el.style.transform = '';
+      });
+    });
+  }
+
+  function initTilt() {
+    if (isTouch || reduceMotion) return;
+    const els = document.querySelectorAll('[data-tilt]');
+    const MAX = 6; // degrees
+    els.forEach((el) => {
+      el.addEventListener('pointermove', (e) => {
+        const r = el.getBoundingClientRect();
+        const x = (e.clientX - r.left) / r.width;
+        const y = (e.clientY - r.top) / r.height;
+        const rx = (0.5 - y) * MAX * 2;
+        const ry = (x - 0.5) * MAX * 2;
+        el.style.transform = `perspective(900px) rotateX(${rx}deg) rotateY(${ry}deg) translateY(-2px)`;
+      });
+      el.addEventListener('pointerleave', () => {
+        el.style.transform = '';
+      });
+    });
+  }
+
+  function initLetterReveal() {
+    const els = document.querySelectorAll('.letter-reveal');
+    if (!els.length) return;
+    // Split text into spans
+    els.forEach((el) => {
+      const text = el.textContent;
+      el.textContent = '';
+      [...text].forEach((ch, i) => {
+        const span = document.createElement('span');
+        span.className = 'ltr';
+        span.textContent = ch;
+        span.style.transitionDelay = `${Math.min(i * 28, 600)}ms`;
+        el.appendChild(span);
+      });
+    });
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('is-revealed'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-revealed');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  function initScramble() {
+    const el = document.querySelector('[data-scramble]');
+    if (!el) return;
+    const target = el.dataset.scrambleText || el.textContent;
+    if (reduceMotion) { el.textContent = target; return; }
+    const chars = '!@#$%^&*<>[]{}/=+_-?abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    const DURATION = 750;
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - start) / DURATION);
+      const settledCount = Math.floor(target.length * t);
+      let out = '';
+      for (let i = 0; i < target.length; i++) {
+        if (i < settledCount) out += target[i];
+        else if (target[i] === ' ') out += ' ';
+        else out += chars[Math.floor(Math.random() * chars.length)];
+      }
+      el.textContent = out;
+      if (t < 1) requestAnimationFrame(tick);
+      else el.textContent = target;
+    }
+    requestAnimationFrame(tick);
   }
 
   function init() {
-    const body = document.querySelector('[data-soc-feed]');
-    if (!body) return;
+    initLetterReveal();
+    initScramble();
+    initSpotlight();
+    initMagnetic();
+    initTilt();
+  }
 
-    // Seed time slightly in the past so the feed feels "already running".
-    const base = new Date();
-    base.setMinutes(base.getMinutes() - 1);
+  return { init };
+})();
 
-    // Pre-fill with a few lines.
-    for (let i = 0; i < 4; i++) {
-      const [sev, msg] = POOL[i % POOL.length];
-      base.setSeconds(base.getSeconds() + 3);
-      body.appendChild(lineNode(sev, msg, fmtTs(base)));
-    }
+/* ---- Command palette (Cmd/Ctrl+K) ---- */
+const PortfolioPalette = (() => {
+  const COMMANDS = [
+    { cmd: 'whoami',    desc: 'About Shulank',           action: () => scrollToId('about') },
+    { cmd: 'ls projects', desc: 'Selected work',          action: () => scrollToId('projects') },
+    { cmd: 'cat experience', desc: 'Career timeline',      action: () => scrollToId('experience') },
+    { cmd: 'cat skills', desc: 'Toolkit',                 action: () => scrollToId('skills') },
+    { cmd: 'cat education', desc: 'Education + certs',    action: () => scrollToId('education') },
+    { cmd: 'cat writing', desc: 'Blog posts',             action: () => { window.location.href = '/blog/'; } },
+    { cmd: 'phishguard', desc: 'PhishGuard Pro case study', action: () => { window.location.href = 'phishguard.html'; } },
+    { cmd: 'mail',      desc: 'Open contact section',    action: () => scrollToId('contact') },
+    { cmd: 'cat resume', desc: 'Download resume PDF',    action: () => triggerDownload() },
+    { cmd: 'gh',        desc: 'Open LinkedIn',           action: () => window.open('https://www.linkedin.com/in/shulank-patel-772710204', '_blank', 'noopener') },
+    { cmd: 'toggle theme', desc: 'Flip light/dark',      action: () => { if (window.PortfolioTheme) PortfolioTheme.toggleTheme(); } },
+    { cmd: 'help',      desc: 'Show all commands',       action: () => { /* no-op, already showing */ } },
+  ];
 
-    if (reduceMotion) {
-      // Static fill for reduced motion: add a few more lines and stop.
-      for (let i = 4; i < MAX_LINES; i++) {
-        const [sev, msg] = POOL[i % POOL.length];
-        base.setSeconds(base.getSeconds() + 3);
-        body.appendChild(lineNode(sev, msg, fmtTs(base)));
-      }
+  let activeIndex = 0;
+  let filtered = COMMANDS.slice();
+
+  function scrollToId(id) {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function triggerDownload() {
+    const a = document.createElement('a');
+    a.href = 'assets/resume/Shulank_Patel_Resume.pdf';
+    a.download = 'Shulank_Patel_Resume.pdf';
+    a.click();
+  }
+
+  function open() {
+    const overlay = document.querySelector('[data-palette-overlay]');
+    const input = document.querySelector('[data-palette-input]');
+    if (!overlay || !input) return;
+    overlay.setAttribute('data-open', 'true');
+    input.value = '';
+    activeIndex = 0;
+    filtered = COMMANDS.slice();
+    render();
+    setTimeout(() => input.focus(), 50);
+  }
+
+  function close() {
+    const overlay = document.querySelector('[data-palette-overlay]');
+    if (overlay) overlay.removeAttribute('data-open');
+  }
+
+  function render() {
+    const list = document.querySelector('[data-palette-list]');
+    if (!list) return;
+    list.innerHTML = '';
+    if (filtered.length === 0) {
+      const empty = document.createElement('div');
+      empty.className = 'palette-empty';
+      empty.textContent = 'No commands match. Try "help".';
+      list.appendChild(empty);
       return;
     }
+    filtered.forEach((c, i) => {
+      const row = document.createElement('div');
+      row.className = 'palette-item';
+      row.setAttribute('role', 'option');
+      if (i === activeIndex) row.setAttribute('data-active', 'true');
+      row.innerHTML = `<span class="cmd">${c.cmd}</span><span class="desc">${c.desc}</span><span class="key">↵</span>`;
+      row.addEventListener('mouseenter', () => { activeIndex = i; render(); });
+      row.addEventListener('click', () => execute(i));
+      list.appendChild(row);
+    });
+  }
 
-    let idx = 4;
-    function tick() {
-      if (document.hidden) return; // pause when tab hidden
-      const [sev, msg] = POOL[idx % POOL.length];
-      idx++;
-      const now = new Date();
-      body.appendChild(lineNode(sev, msg, fmtTs(now)));
-      while (body.children.length > MAX_LINES) body.removeChild(body.firstElementChild);
+  function execute(i) {
+    const c = filtered[i];
+    if (!c) return;
+    close();
+    setTimeout(() => c.action(), 100);
+  }
+
+  function filter(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) { filtered = COMMANDS.slice(); }
+    else { filtered = COMMANDS.filter((c) => c.cmd.includes(q) || c.desc.toLowerCase().includes(q)); }
+    activeIndex = 0;
+    render();
+  }
+
+  function init() {
+    const overlay = document.querySelector('[data-palette-overlay]');
+    const input = document.querySelector('[data-palette-input]');
+    if (!overlay || !input) return;
+
+    document.addEventListener('keydown', (e) => {
+      const isOpen = overlay.getAttribute('data-open') === 'true';
+      const isPaletteShortcut = (e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k';
+      if (isPaletteShortcut) {
+        e.preventDefault();
+        if (isOpen) close(); else open();
+        return;
+      }
+      if (!isOpen) return;
+      if (e.key === 'Escape') { e.preventDefault(); close(); return; }
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        activeIndex = Math.min(filtered.length - 1, activeIndex + 1);
+        render();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        activeIndex = Math.max(0, activeIndex - 1);
+        render();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        execute(activeIndex);
+      }
+    });
+
+    input.addEventListener('input', (e) => filter(e.target.value));
+
+    overlay.addEventListener('click', (e) => {
+      if (e.target === overlay) close();
+    });
+
+    const trigger = document.querySelector('[data-palette-trigger]');
+    if (trigger) trigger.addEventListener('click', open);
+  }
+
+  return { init, open };
+})();
+
+/* ---- PhishGuard Pro demo widget ---- */
+const PortfolioPhishDemo = (() => {
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  const PHASES = [
+    'Core',
+    'Enrichment',
+    'Modern Threats',
+    'MITRE + IOC',
+    'External APIs',
+    'Intelligence',
+  ];
+
+  // Per-sample finding scripts. Each entry: [phaseIndex, severity, message]
+  const SAMPLES = [
+    {
+      // Microsoft credential phish (BitB)
+      verdict: { level: 'crit', label: 'HIGH RISK · CREDENTIAL HARVEST', mitre: 'T1566.001 · T1656 · T1557' },
+      findings: [
+        [0, 'info', 'Header parsed · SPF: softfail · DKIM: none'],
+        [0, 'warn', 'Sender domain `m1crosoftonline.com` is lookalike of microsoftonline.com'],
+        [1, 'warn', 'WHOIS: domain registered 4d ago · privacy-protected'],
+        [2, 'crit', 'BitB DOM fingerprint detected · score 0.87'],
+        [2, 'warn', 'Redirect chain ends at credential-harvest URL'],
+        [3, 'info', 'MITRE map: T1566.001, T1656, T1557'],
+        [3, 'info', 'IOC bundle: 1 sender, 2 URLs, 1 IP'],
+        [4, 'warn', 'urlscan.io: phishing-confidence 92%'],
+        [5, 'info', 'STIX 2.1 bundle ready for SIEM export'],
+      ],
+    },
+    {
+      // OAuth consent phish
+      verdict: { level: 'crit', label: 'HIGH RISK · OAUTH CONSENT ABUSE', mitre: 'T1528 · T1199' },
+      findings: [
+        [0, 'info', 'Header parsed · DocuSign branding cloned'],
+        [0, 'warn', 'Sender domain `docusign-share.live` not a DocuSign property'],
+        [1, 'info', 'WHOIS: domain registered 11d ago'],
+        [2, 'crit', 'OAuth consent URL requests `Mail.ReadWrite Mail.Send`'],
+        [2, 'warn', 'Scope exceeds legitimate DocuSign integration baseline'],
+        [3, 'info', 'MITRE map: T1528 (OAuth consent), T1199 (trusted relationship)'],
+        [4, 'warn', 'VirusTotal: 3/89 vendors flag the consent URL'],
+        [5, 'info', 'STIX 2.1 bundle ready for SIEM export'],
+      ],
+    },
+    {
+      // BEC wire fraud
+      verdict: { level: 'warn', label: 'MEDIUM RISK · BEC IMPERSONATION', mitre: 'T1656 · T1534' },
+      findings: [
+        [0, 'info', 'Header parsed · reply-to differs from from-address'],
+        [0, 'warn', 'CEO impersonation pattern: "quick favor" + urgency'],
+        [1, 'warn', 'Domain `acme-corp-finance.co` is 2d old'],
+        [2, 'warn', 'No attached file / no link — pure social engineering'],
+        [3, 'info', 'MITRE map: T1656 (impersonation), T1534 (internal spearphish)'],
+        [4, 'info', 'urlscan.io: no URLs to scan'],
+        [5, 'info', 'STIX 2.1 bundle: 1 sender, 1 domain'],
+      ],
+    },
+  ];
+
+  let selectedIdx = 0;
+  let running = false;
+
+  function el(query) { return document.querySelector(query); }
+
+  function setSelected(idx) {
+    selectedIdx = idx;
+    document.querySelectorAll('.pg-sample').forEach((b, i) => {
+      b.setAttribute('aria-pressed', String(i === idx));
+    });
+  }
+
+  function reset() {
+    const run = el('[data-pg-run]');
+    if (run) run.innerHTML = '<div class="pg-demo-empty">Pick a sample on the left and hit Analyze.<br>The 6-phase pipeline will run live.</div>';
+  }
+
+  function buildSkeleton() {
+    const run = el('[data-pg-run]');
+    if (!run) return null;
+    run.innerHTML = '';
+    PHASES.forEach((name, i) => {
+      const row = document.createElement('div');
+      row.className = 'pg-phase';
+      row.dataset.pgPhase = String(i);
+      row.innerHTML =
+        `<span class="pg-phase-tag">${String(i + 1).padStart(2, '0')}</span>` +
+        `<span class="pg-phase-name">${name}</span>` +
+        `<span class="pg-bar"><span class="pg-bar-fill"></span></span>` +
+        `<span class="pg-check">…</span>`;
+      run.appendChild(row);
+    });
+    const findings = document.createElement('div');
+    findings.className = 'pg-findings';
+    findings.setAttribute('data-pg-findings', '');
+    run.appendChild(findings);
+    return run;
+  }
+
+  function appendFinding(phaseIdx, sev, msg) {
+    const box = el('[data-pg-findings]');
+    if (!box) return;
+    const row = document.createElement('div');
+    row.className = 'pg-finding';
+    row.innerHTML = `<span class="pg-finding-sev ${sev}">[P${String(phaseIdx + 1).padStart(2, '0')} ${sev.toUpperCase()}]</span><span class="pg-finding-msg">${msg}</span>`;
+    box.appendChild(row);
+  }
+
+  function setPhaseDone(i) {
+    const node = document.querySelector(`.pg-phase[data-pg-phase="${i}"]`);
+    if (!node) return;
+    node.setAttribute('data-done', 'true');
+    node.querySelector('.pg-check').textContent = '✓';
+  }
+
+  function setPhaseProgress(i, pct) {
+    const node = document.querySelector(`.pg-phase[data-pg-phase="${i}"]`);
+    if (!node) return;
+    const fill = node.querySelector('.pg-bar-fill');
+    fill.style.width = `${pct}%`;
+  }
+
+  function appendVerdict(sample) {
+    const run = el('[data-pg-run]');
+    if (!run) return;
+    const v = document.createElement('div');
+    v.className = `pg-verdict ${sample.verdict.level}`;
+    v.innerHTML =
+      `<div class="pg-verdict-title">Verdict · ${sample.verdict.label}</div>` +
+      `<div class="pg-verdict-mitre">MITRE: ${sample.verdict.mitre} · STIX 2.1 bundle exported (demo)</div>`;
+    run.appendChild(v);
+  }
+
+  function sleep(ms) { return new Promise((r) => setTimeout(r, ms)); }
+
+  async function run() {
+    if (running) return;
+    running = true;
+    const btn = el('[data-pg-analyze]');
+    btn.disabled = true;
+    const originalText = btn.textContent;
+    btn.textContent = 'Analyzing…';
+
+    buildSkeleton();
+    const sample = SAMPLES[selectedIdx];
+
+    if (reduceMotion) {
+      // Static fill — no animation
+      PHASES.forEach((_, i) => setPhaseDone(i));
+      sample.findings.forEach(([p, s, m]) => appendFinding(p, s, m));
+      appendVerdict(sample);
+    } else {
+      const findingsByPhase = new Map();
+      sample.findings.forEach(([p, s, m]) => {
+        if (!findingsByPhase.has(p)) findingsByPhase.set(p, []);
+        findingsByPhase.get(p).push([s, m]);
+      });
+
+      for (let i = 0; i < PHASES.length; i++) {
+        // Animate bar fill in ~6 steps over ~450ms
+        for (let s = 1; s <= 6; s++) {
+          setPhaseProgress(i, (s / 6) * 100);
+          await sleep(70);
+        }
+        // Emit findings for this phase
+        const fs = findingsByPhase.get(i) || [];
+        for (const [sev, msg] of fs) {
+          appendFinding(i, sev, msg);
+          await sleep(180);
+        }
+        setPhaseDone(i);
+        await sleep(120);
+      }
+      appendVerdict(sample);
     }
-    setInterval(tick, INTERVAL);
+
+    btn.disabled = false;
+    btn.textContent = originalText;
+    running = false;
+  }
+
+  function init() {
+    const widget = el('.pg-demo');
+    if (!widget) return;
+    document.querySelectorAll('.pg-sample').forEach((b, i) => {
+      b.addEventListener('click', () => { if (!running) { setSelected(i); reset(); } });
+    });
+    const analyze = el('[data-pg-analyze]');
+    if (analyze) analyze.addEventListener('click', run);
   }
 
   return { init };
@@ -356,5 +718,7 @@ document.addEventListener('DOMContentLoaded', () => {
   PortfolioNav.init();
   PortfolioContact.init();
   PortfolioScroll.init();
-  PortfolioFeed.init();
+  PortfolioPolish.init();
+  PortfolioPalette.init();
+  PortfolioPhishDemo.init();
 });

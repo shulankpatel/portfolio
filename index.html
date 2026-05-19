@@ -30,6 +30,9 @@
       <li><a href="#contact">Contact</a></li>
     </ul>
     <div class="nav-cta">
+      <button class="palette-trigger" data-palette-trigger aria-label="Open command palette (Cmd+K)" title="Open command palette">
+        <span class="mono">⌘K</span>
+      </button>
       <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">☾</button>
       <a class="btn btn-primary" href="assets/resume/Shulank_Patel_Resume.pdf" download>Resume ↓</a>
       <button class="nav-toggle" data-nav-toggle aria-label="Open menu" aria-expanded="false">☰</button>
@@ -55,7 +58,7 @@
 
         <div class="hero-prompt">$ whoami<span class="caret">▊</span></div>
 
-        <h1>Shulank Patel<span class="accent">.</span></h1>
+        <h1><span data-scramble data-scramble-text="Shulank Patel">Shulank Patel</span><span class="accent">.</span></h1>
 
         <p class="hero-tagline">
           <strong>SOC Analyst</strong> at dayOneCyber. I build automated detection &amp; response workflows that cut investigation time and surface real threats faster.
@@ -67,8 +70,8 @@
         </div>
 
         <div class="hero-cta">
-          <a href="#projects" class="btn btn-primary btn-lg">View Work →</a>
-          <a href="assets/resume/Shulank_Patel_Resume.pdf" class="btn btn-secondary btn-lg" download>Download Resume ↓</a>
+          <a href="#projects" class="btn btn-primary btn-lg" data-magnetic>View Work →</a>
+          <a href="assets/resume/Shulank_Patel_Resume.pdf" class="btn btn-secondary btn-lg" download data-magnetic>Download Resume ↓</a>
         </div>
 
         <div class="stats" aria-label="Impact metrics">
@@ -94,20 +97,45 @@
           </div>
         </div>
 
-        <div class="soc-feed" aria-label="Live SOC threat feed (demo)">
-          <div class="soc-feed-header">
-            <span class="soc-feed-status"><span class="soc-feed-dot" aria-hidden="true"></span> Live</span>
-            <span class="soc-feed-title">soc.threat-feed.log</span>
-            <span class="soc-feed-meta">phishguard-pro · 25 modules online</span>
+        <div class="pg-demo" aria-label="PhishGuard Pro live analyzer demo">
+          <div class="pg-demo-header">
+            <span class="pg-demo-title">PhishGuard Pro · analyzer</span>
+            <span>pipeline: 6 phases · 25 modules</span>
+            <span class="pg-demo-meta">demo mode</span>
           </div>
-          <div class="soc-feed-body" data-soc-feed></div>
+          <div class="pg-demo-body">
+            <div class="pg-demo-pick">
+              <h4>Pick a sample</h4>
+              <button class="pg-sample" data-pg-sample="0" aria-pressed="true">
+                <div class="pg-sample-from">from: it-security@m1crosoftonline.com</div>
+                <div class="pg-sample-subject">Action required: re-verify your Microsoft 365 account</div>
+                Your account will be suspended in 24 hours. Sign in here to verify…
+              </button>
+              <button class="pg-sample" data-pg-sample="1" aria-pressed="false">
+                <div class="pg-sample-from">from: docusign@docusign-share.live</div>
+                <div class="pg-sample-subject">You have 1 document waiting · grants Mail.ReadWrite</div>
+                Review and accept access. (consent URL: login.microsoftonline.com/…)
+              </button>
+              <button class="pg-sample" data-pg-sample="2" aria-pressed="false">
+                <div class="pg-sample-from">from: ceo@acme-corp-finance.co</div>
+                <div class="pg-sample-subject">Urgent: wire transfer needed before EOD</div>
+                Hi — quick favor. Process a $48,200 wire to the attached…
+              </button>
+              <button class="pg-demo-analyze" data-pg-analyze>Analyze with PhishGuard Pro →</button>
+            </div>
+            <div class="pg-demo-run" data-pg-run>
+              <div class="pg-demo-empty">
+                Pick a sample on the left and hit Analyze.<br>The 6-phase pipeline will run live.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
 
     <section class="about container" id="about" data-reveal>
       <span class="section-label">About</span>
-      <h2>Detection meets automation.</h2>
+      <h2 class="letter-reveal">Detection meets automation.</h2>
       <p>
         I'm a <strong>SOC Analyst at dayOneCyber</strong> with two years of hands-on experience in threat detection, incident response, and vulnerability management. I work mostly in Microsoft 365 Defender (XDR), and I lean heavily on automation — N8n workflows, Python pipelines, and SIEM/SOAR integrations — to cut response times and free up human attention for the things that actually need it.
       </p>
@@ -115,11 +143,11 @@
 
     <section class="container" id="projects" data-reveal>
       <span class="section-label">Projects</span>
-      <h2 style="margin-bottom:32px">Selected work.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:32px">Selected work.</h2>
 
       <div class="projects-grid">
 
-        <article class="project-card featured">
+        <article class="project-card featured" data-tilt>
           <div class="project-thumb" aria-hidden="true">
   <svg viewBox="0 0 320 200" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -165,7 +193,7 @@
           </div>
         </article>
 
-        <article class="project-card">
+        <article class="project-card" data-tilt>
           <div class="project-thumb" aria-hidden="true">
   <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -211,7 +239,7 @@
           <a class="project-link" href="#contact">Ask me about it</a>
         </article>
 
-        <article class="project-card">
+        <article class="project-card" data-tilt>
           <div class="project-thumb" aria-hidden="true">
   <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -251,7 +279,7 @@
           <a class="project-link" href="#contact">Ask me about it</a>
         </article>
 
-        <article class="project-card">
+        <article class="project-card" data-tilt>
           <div class="project-thumb" aria-hidden="true">
   <svg viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg">
     <defs>
@@ -298,7 +326,7 @@
 
     <section class="container" id="experience" data-reveal>
       <span class="section-label">Experience</span>
-      <h2 style="margin-bottom:32px">Where I've worked.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:32px">Where I've worked.</h2>
 
       <div class="timeline">
 
@@ -354,7 +382,7 @@
 
     <section class="container" id="skills" data-reveal>
       <span class="section-label">Skills</span>
-      <h2 style="margin-bottom:32px">Toolkit.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:32px">Toolkit.</h2>
 
       <div class="skills-grid">
         <div class="skill-group">
@@ -405,7 +433,7 @@
 
     <section class="container" id="education" data-reveal>
       <span class="section-label">Education &amp; certifications</span>
-      <h2 style="margin-bottom:32px">Learning.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:32px">Learning.</h2>
 
       <div class="edu-cert">
         <div>
@@ -445,7 +473,7 @@
 
     <section class="container" id="writing" data-reveal>
       <span class="section-label">Writing</span>
-      <h2 style="margin-bottom:8px">Notes from the SOC.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:8px">Notes from the SOC.</h2>
       <p style="margin-bottom:32px;color:var(--text-muted)">Long-form notes on detection, automation, and modern phishing threats.</p>
 
       <div class="writing-grid">
@@ -472,7 +500,7 @@
 
     <section class="container" id="contact" data-reveal>
       <span class="section-label">Contact</span>
-      <h2 style="margin-bottom:8px">Get in touch.</h2>
+      <h2 class="letter-reveal" style="margin-bottom:8px">Get in touch.</h2>
       <p style="margin-bottom:32px;color:var(--text-muted)">Open to SOC Analyst, Detection Engineer, and Security Automation roles. Fill in the form or reach me directly below.</p>
 
       <div class="contact-grid">
@@ -521,6 +549,16 @@
       <div class="mono">tactical_midnight v1</div>
     </div>
   </footer>
+  <div class="palette-overlay" data-palette-overlay role="dialog" aria-modal="true" aria-labelledby="palette-label">
+    <div class="palette" role="document">
+      <div class="palette-input-row">
+        <span class="palette-prompt">$</span>
+        <input class="palette-input" data-palette-input type="text" placeholder="Type a command (try: whoami, projects, resume, help)" aria-label="Command palette input" id="palette-label">
+        <span class="palette-kbd">esc</span>
+      </div>
+      <div class="palette-list" data-palette-list role="listbox"></div>
+    </div>
+  </div>
   <script src="assets/js/main.js" defer></script>
   <script src="assets/js/network-bg.js" defer></script>
 </body>
