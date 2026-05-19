@@ -164,8 +164,197 @@ const PortfolioContact = (() => {
   return { validateContact, init };
 })();
 
+/* ---- Scroll behaviors (reveal, counters, scroll-spy) ---- */
+const PortfolioScroll = (() => {
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  function initReveal() {
+    const els = document.querySelectorAll('[data-reveal]');
+    if (!els.length) return;
+    if (reduceMotion || !('IntersectionObserver' in window)) {
+      els.forEach((el) => el.classList.add('is-visible'));
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          e.target.classList.add('is-visible');
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -10% 0px' });
+    els.forEach((el) => io.observe(el));
+  }
+
+  function animateCount(el) {
+    const target = Number(el.dataset.count);
+    const prefix = el.dataset.prefix || '';
+    const suffix = el.dataset.suffix || '';
+    const duration = Number(el.dataset.duration) || 1400;
+    if (!Number.isFinite(target)) return;
+    if (reduceMotion) {
+      el.textContent = `${prefix}${target}${suffix}`;
+      return;
+    }
+    const start = performance.now();
+    function tick(now) {
+      const t = Math.min(1, (now - start) / duration);
+      const eased = 1 - Math.pow(1 - t, 3); // ease-out cubic
+      const value = Math.round(target * eased);
+      el.textContent = `${prefix}${value}${suffix}`;
+      if (t < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  }
+
+  function initCounters() {
+    const els = document.querySelectorAll('[data-count]');
+    if (!els.length) return;
+    if (!('IntersectionObserver' in window)) {
+      els.forEach(animateCount);
+      return;
+    }
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) {
+          animateCount(e.target);
+          io.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.4 });
+    els.forEach((el) => io.observe(el));
+  }
+
+  function initSpy() {
+    const sections = Array.from(document.querySelectorAll('section[id]'));
+    const links = Array.from(document.querySelectorAll('.nav-links a[href^="#"]'));
+    if (!sections.length || !links.length || !('IntersectionObserver' in window)) return;
+
+    const linkByHash = new Map(links.map((a) => [a.getAttribute('href').replace('#', ''), a]));
+
+    function setActive(id) {
+      links.forEach((a) => a.removeAttribute('aria-current'));
+      const match = linkByHash.get(id);
+      if (match) match.setAttribute('aria-current', 'true');
+    }
+
+    const visible = new Map();
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach((e) => {
+        if (e.isIntersecting) visible.set(e.target.id, e.intersectionRatio);
+        else visible.delete(e.target.id);
+      });
+      let bestId = null, bestRatio = 0;
+      for (const [id, ratio] of visible) {
+        if (ratio > bestRatio) { bestRatio = ratio; bestId = id; }
+      }
+      if (bestId) setActive(bestId);
+    }, { threshold: [0.25, 0.5, 0.75], rootMargin: '-80px 0px -40% 0px' });
+
+    sections.forEach((s) => io.observe(s));
+  }
+
+  function init() {
+    initReveal();
+    initCounters();
+    initSpy();
+  }
+
+  return { init };
+})();
+
+/* ---- SOC live feed (hero) ---- */
+const PortfolioFeed = (() => {
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // (severity, message)
+  const POOL = [
+    ['info', 'Inbound mail processed · 2,341 messages'],
+    ['warn', 'T1566.001 attachment hash matched IoC DB'],
+    ['crit', 'BitB DOM fingerprint detected · score 0.87'],
+    ['info', 'Auto-quarantine: 3 messages'],
+    ['warn', 'OAuth consent scope mismatch · flagged for review'],
+    ['crit', 'AiTM TLS pattern matched · kit: Evilginx2 v3.2'],
+    ['info', 'STIX 2.1 bundle pushed → SIEM'],
+    ['info', 'MITRE map: T1528, T1557, T1566.001'],
+    ['warn', 'urlscan.io phishing-confidence: 92%'],
+    ['crit', 'Sender impersonation · T1656 · domain age 4d'],
+    ['info', 'Analyst notification dispatched'],
+    ['info', 'Pipeline runtime 1.4s · 25/25 modules ok'],
+    ['warn', 'QR redirect resolves to credential-harvest URL'],
+    ['crit', 'Tycoon 2FA kit fingerprint · campaign_v2'],
+    ['info', 'Defender for Endpoint: alert acknowledged'],
+    ['warn', 'WHOIS · registrant privacy + 2d-old domain'],
+    ['info', 'Secure Score Δ +0.4 over rolling 7d'],
+    ['crit', 'AI-generated body detected · perplexity 13.2'],
+    ['info', 'IOC enrichment complete · 14 indicators'],
+    ['warn', 'CAPTCHA cloaking detected on redirect chain'],
+  ];
+
+  const MAX_LINES = 7;
+  const INTERVAL = 1600;
+
+  function fmtTs(d) {
+    const pad = (n) => String(n).padStart(2, '0');
+    return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+
+  function lineNode(sev, msg, ts) {
+    const row = document.createElement('div');
+    row.className = 'soc-feed-line';
+    row.innerHTML =
+      `<span class="ts">${ts}</span>` +
+      `<span class="sev ${sev}">[${sev.toUpperCase()}]</span>` +
+      `<span class="msg">${msg}</span>`;
+    return row;
+  }
+
+  function init() {
+    const body = document.querySelector('[data-soc-feed]');
+    if (!body) return;
+
+    // Seed time slightly in the past so the feed feels "already running".
+    const base = new Date();
+    base.setMinutes(base.getMinutes() - 1);
+
+    // Pre-fill with a few lines.
+    for (let i = 0; i < 4; i++) {
+      const [sev, msg] = POOL[i % POOL.length];
+      base.setSeconds(base.getSeconds() + 3);
+      body.appendChild(lineNode(sev, msg, fmtTs(base)));
+    }
+
+    if (reduceMotion) {
+      // Static fill for reduced motion: add a few more lines and stop.
+      for (let i = 4; i < MAX_LINES; i++) {
+        const [sev, msg] = POOL[i % POOL.length];
+        base.setSeconds(base.getSeconds() + 3);
+        body.appendChild(lineNode(sev, msg, fmtTs(base)));
+      }
+      return;
+    }
+
+    let idx = 4;
+    function tick() {
+      if (document.hidden) return; // pause when tab hidden
+      const [sev, msg] = POOL[idx % POOL.length];
+      idx++;
+      const now = new Date();
+      body.appendChild(lineNode(sev, msg, fmtTs(now)));
+      while (body.children.length > MAX_LINES) body.removeChild(body.firstElementChild);
+    }
+    setInterval(tick, INTERVAL);
+  }
+
+  return { init };
+})();
+
 document.addEventListener('DOMContentLoaded', () => {
   PortfolioTheme.init();
   PortfolioNav.init();
   PortfolioContact.init();
+  PortfolioScroll.init();
+  PortfolioFeed.init();
 });
