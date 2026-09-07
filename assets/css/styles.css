@@ -595,6 +595,8 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 }
 .cert-card--featured:hover { border-color: rgba(196,18,48,0.7); box-shadow: 0 0 0 1px rgba(196,18,48,0.2), 0 8px 32px rgba(196,18,48,0.12); }
 
+.cert-card--wide { grid-column: 1 / -1; }
+
 .cert-badge { flex-shrink: 0; }
 
 .cert-card-body { flex: 1; min-width: 0; }
@@ -613,6 +615,11 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   color: var(--accent);
   margin-bottom: 12px;
 }
+.cert-issuer a {
+  color: inherit;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 40%, transparent);
+}
+.cert-issuer a:hover { border-bottom-color: var(--accent); }
 .cert-status {
   font-family: var(--font-mono);
   font-size: 11px;
