@@ -595,19 +595,34 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 }
 .cert-card--featured:hover { border-color: rgba(196,18,48,0.7); box-shadow: 0 0 0 1px rgba(196,18,48,0.2), 0 8px 32px rgba(196,18,48,0.12); }
 
-.cert-badge { flex-shrink: 0; }
-.cert-badge img, .cert-badge svg {
-  width: 104px;
-  height: 104px;
-  display: block;
+/* Issuer logos arrive in three different shapes — CySA+ is a circle on
+   transparency, Security+ a white square, TryHackMe a wide transparent
+   wordmark whose text is black. A shared white plate is what makes them
+   read as one set, and it is what keeps the TryHackMe text legible on a
+   dark card. Each logo is centred at its own aspect ratio inside it. */
+.cert-badge {
+  flex-shrink: 0;
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 112px;
+  padding: 12px 16px;
+  background: #fff;
   border-radius: 14px;
 }
-/* The two CompTIA badges ship differently — Security+ has a white square
-   baked in, CySA+ is a circle on transparency. A shared white plate makes
-   the pair read as one set against the dark card. */
+/* The TryHackMe wordmark is 500x281, the smallest source of the three.
+   Capping the plate at 112px on phones keeps it inside 3x-retina
+   resolution; desktops are 2x at most, so the logo can go larger there. */
+@media (min-width: 768px) {
+  .cert-badge { height: 132px; padding: 14px 18px; }
+}
 .cert-badge img {
-  background: #fff;
-  padding: 8px;
+  display: block;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
   object-fit: contain;
 }
 
