@@ -772,21 +772,33 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 .case-tagline { font-size: clamp(18px, 2vw, 22px); color: var(--text-muted); margin-bottom: 20px; max-width: 720px; }
 
 .pipeline {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
   margin-top: 24px;
 }
-@media (min-width: 768px) { .pipeline { grid-template-columns: repeat(4, 1fr); } }
-@media (min-width: 1024px) { .pipeline { grid-template-columns: repeat(7, 1fr); } }
 .phase {
-  padding: 16px 14px;
+  padding: 14px 16px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-left: 2px solid var(--primary);
   border-radius: var(--radius-sm);
   position: relative;
-  align-self: start;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 8px;
+}
+@media (min-width: 768px) {
+  .phase {
+    grid-template-columns: 148px minmax(0, 1fr);
+    grid-template-rows: auto auto;
+    column-gap: 24px;
+    row-gap: 2px;
+    padding: 16px 18px;
+  }
+  .phase .phase-num { grid-column: 1; grid-row: 1; align-self: end; }
+  .phase h4         { grid-column: 1; grid-row: 2; align-self: start; }
+  .phase ul         { grid-column: 2; grid-row: 1 / span 2; align-self: center; }
 }
 .phase .phase-num {
   font-family: var(--font-mono);
@@ -794,15 +806,24 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   letter-spacing: 1.5px;
   color: var(--primary);
   text-transform: uppercase;
-  margin-bottom: 6px;
 }
-.phase h4 { font-size: 14px; margin-bottom: 6px; }
+.phase h4 { font-size: 14px; }
 .phase ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.phase li {
   font-family: var(--font-mono);
   font-size: 11px;
-  color: var(--text-dim);
+  line-height: 1.5;
+  padding: 3px 10px;
+  border: 1px solid color-mix(in srgb, var(--primary) 16%, transparent);
+  border-radius: 100px;
+  background: color-mix(in srgb, var(--primary) 4%, transparent);
+  color: var(--text-muted);
+  white-space: nowrap;
 }
-.phase li { padding: 2px 0; overflow-wrap: anywhere; }
 
 .module-card {
   padding: 20px;
