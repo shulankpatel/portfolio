@@ -617,6 +617,15 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 @media (min-width: 768px) {
   .cert-badge { height: 132px; padding: 14px 18px; }
 }
+/* A square mark at the same height as a wide wordmark carries roughly
+   half the visual area, so the CompTIA badges read as small next to
+   TryHackMe. Giving them a taller plate matches the two by area instead
+   of by height; their sources are 601px and 1200px, so there is ample
+   resolution for it. */
+.cert-badge--square { height: 140px; }
+@media (min-width: 768px) {
+  .cert-badge--square { height: 168px; }
+}
 .cert-badge img {
   display: block;
   max-width: 100%;
