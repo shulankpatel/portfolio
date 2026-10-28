@@ -578,8 +578,9 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 
 .cert-card {
   display: flex;
-  gap: 20px;
-  padding: 24px;
+  flex-direction: column;
+  gap: 18px;
+  padding: 28px 26px;
   background: var(--bg-card);
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
@@ -591,15 +592,27 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
 }
 .cert-card--featured {
   border-color: rgba(196,18,48,0.35);
-  grid-column: 1 / -1;
 }
 .cert-card--featured:hover { border-color: rgba(196,18,48,0.7); box-shadow: 0 0 0 1px rgba(196,18,48,0.2), 0 8px 32px rgba(196,18,48,0.12); }
 
-.cert-card--wide { grid-column: 1 / -1; }
-
 .cert-badge { flex-shrink: 0; }
+.cert-badge img, .cert-badge svg {
+  width: 104px;
+  height: 104px;
+  display: block;
+  border-radius: 14px;
+}
+/* The two CompTIA badges ship differently — Security+ has a white square
+   baked in, CySA+ is a circle on transparency. A shared white plate makes
+   the pair read as one set against the dark card. */
+.cert-badge img {
+  background: #fff;
+  padding: 8px;
+  object-fit: contain;
+}
 
-.cert-card-body { flex: 1; min-width: 0; }
+.cert-card-body { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.cert-card-body .tag-row { margin-top: auto; margin-bottom: 0; padding-top: 4px; }
 
 .cert-card-top {
   display: flex;
