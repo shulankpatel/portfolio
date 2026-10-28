@@ -49,7 +49,7 @@
       <a class="case-back" href="index.html">← Back to portfolio</a>
       <span class="section-label">Case study · 2026</span>
       <h1 style="margin-bottom:16px">PhishGuard Pro.</h1>
-      <p class="case-tagline">Automated phishing email analysis with 25 modules, MITRE ATT&amp;CK mapping for 31 techniques, and STIX 2.1 export for SIEM/SOAR integration.</p>
+      <p class="case-tagline">Automated phishing email analysis with 36 modules across 7 phases, MITRE ATT&amp;CK mapping for 26 techniques, and STIX 2.1 export for SIEM/SOAR integration.</p>
       <div class="tag-row">
         <span class="tag">Python 3.9</span>
         <span class="tag">Flask</span>
@@ -58,13 +58,15 @@
         <span class="tag">MITRE ATT&amp;CK</span>
         <span class="tag">STIX 2.1</span>
         <span class="tag">VirusTotal API</span>
+        <span class="tag">AlienVault OTX</span>
+        <span class="tag">PhishTank</span>
       </div>
 
       <div class="stats" style="margin-top:32px">
-        <div class="stat"><div class="stat-label">Modules</div><div class="stat-value" data-count="25">0</div><div class="stat-desc">Across 6 phases</div></div>
-        <div class="stat accent"><div class="stat-label">Phases</div><div class="stat-value" data-count="6">0</div><div class="stat-desc">Core → Intelligence</div></div>
-        <div class="stat"><div class="stat-label">MITRE</div><div class="stat-value" data-count="31">0</div><div class="stat-desc">ATT&amp;CK techniques</div></div>
-        <div class="stat accent"><div class="stat-label">Export</div><div class="stat-value">STIX 2.1</div><div class="stat-desc">SIEM / SOAR ready</div></div>
+        <div class="stat"><div class="stat-label">Modules</div><div class="stat-value" data-count="36">0</div><div class="stat-desc">Across 7 phases</div></div>
+        <div class="stat accent"><div class="stat-label">Phases</div><div class="stat-value" data-count="7">0</div><div class="stat-desc">Core → Scoring</div></div>
+        <div class="stat"><div class="stat-label">MITRE</div><div class="stat-value" data-count="26">0</div><div class="stat-desc">ATT&amp;CK techniques</div></div>
+        <div class="stat accent"><div class="stat-label">Tests</div><div class="stat-value" data-count="504">0</div><div class="stat-desc">Across 68 test files</div></div>
       </div>
     </section>
 
@@ -72,13 +74,13 @@
       <span class="section-label">The problem</span>
       <h2 style="margin-bottom:16px">Phishing triage is expensive.</h2>
       <p>In a SOC, suspicious-email tickets are one of the most common — and one of the most under-tooled — workflows. Analysts paste headers into a notepad, walk through URL extraction by hand, pivot through WHOIS lookups, scan attachments through one engine after another, and only then start writing up findings.</p>
-      <p>At dayOneCyber, I built an internal triage pipeline that cut investigation time by <strong>40%</strong>. But it was bespoke to our environment. PhishGuard Pro is the open, more rigorous version: <strong>25 specialized analyzers</strong> that run in parallel, modern-threat detection built in (BitB, AiTM, OAuth consent phishing, phishing-kit fingerprinting), and a SIEM/SOAR-ready export so the analyst's work doesn't end at "yes it's phishing."</p>
+      <p>At dayOneCyber, I built an internal triage pipeline that cut investigation time by <strong>40%</strong>. But it was bespoke to our environment. PhishGuard Pro is the open, more rigorous version: <strong>36 modules</strong> that run in parallel within each phase, modern-threat detection built in (BitB, AiTM, ClickFix, HTML smuggling, device-code and OAuth consent phishing, reply-chain hijacking, phishing-kit fingerprinting), and a SIEM/SOAR-ready export so the analyst's work doesn't end at "yes it's phishing."</p>
     </section>
 
     <section class="container prose" data-reveal>
       <span class="section-label">The approach</span>
-      <h2 style="margin-bottom:16px">Six phases, one report.</h2>
-      <p>Every email runs through six pipeline phases. Each phase is independent — modules add findings to a shared report, the pipeline never blocks waiting for an external API, and any phase can be disabled at runtime.</p>
+      <h2 style="margin-bottom:16px">Seven phases, one report.</h2>
+      <p>Every email runs through seven pipeline phases. Modules inside a phase run in parallel and add findings to a shared report; the pipeline never blocks waiting for an external API, and any module gated on an API key is skipped cleanly when that key isn't configured.</p>
 
       <div class="pipeline" role="list">
         <div class="phase">
@@ -93,23 +95,28 @@
         </div>
         <div class="phase">
           <div class="phase-num">Phase 03</div>
-          <h4>Modern Threats</h4>
-          <ul><li>redirect</li><li>oauth</li><li>bitb</li><li>dns_ssl</li><li>campaign</li><li>language</li></ul>
+          <h4>Modern threats</h4>
+          <ul><li>redirect</li><li>oauth</li><li>bitb</li><li>dns_ssl</li><li>campaign</li><li>language</li><li>clickfix</li><li>html_smuggling</li><li>device_code</li><li>reply_chain</li><li>malwarebazaar</li><li>phishing_db</li><li>homograph</li><li>received_chain_forensics</li></ul>
         </div>
         <div class="phase">
           <div class="phase-num">Phase 04</div>
-          <h4>MITRE + IOC</h4>
-          <ul><li>mitre_mapper</li><li>ioc_extractor</li></ul>
+          <h4>Correlation</h4>
+          <ul><li>mitre</li><li>iocs</li></ul>
         </div>
         <div class="phase">
           <div class="phase-num">Phase 05</div>
-          <h4>External APIs</h4>
-          <ul><li>virustotal</li><li>urlscan</li><li>ai_analyzer</li></ul>
+          <h4>Threat intel</h4>
+          <ul><li>vt</li><li>urlscan</li><li>otx</li><li>phishtank</li><li>ai</li></ul>
         </div>
         <div class="phase">
           <div class="phase-num">Phase 06</div>
           <h4>Intelligence</h4>
           <ul><li>sandbox</li><li>community_db</li><li>threat_actor</li></ul>
+        </div>
+        <div class="phase">
+          <div class="phase-num">Phase 07</div>
+          <h4>Scoring</h4>
+          <ul><li>confidence</li><li>guidance</li><li>report</li></ul>
         </div>
       </div>
     </section>
@@ -136,7 +143,7 @@
         </div>
         <div class="module-card">
           <div class="module-name">mitre_mapper.py</div>
-          <h4>31 ATT&amp;CK technique mappings</h4>
+          <h4>26 ATT&amp;CK technique mappings</h4>
           <p>Maps findings to specific ATT&amp;CK techniques — T1566.001 spearphishing attachment, T1528 OAuth consent abuse, T1557 AiTM, T1656 impersonation, T1598.004 spearphishing voice. SOC reports inherit ATT&amp;CK references for free.</p>
         </div>
         <div class="module-card">

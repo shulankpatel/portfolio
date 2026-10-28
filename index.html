@@ -102,7 +102,7 @@
         <div class="pg-demo" aria-label="PhishGuard Pro live analyzer demo">
           <div class="pg-demo-header">
             <span class="pg-demo-title">PhishGuard Pro · analyzer</span>
-            <span>pipeline: 6 phases · 25 modules</span>
+            <span>pipeline: 7 phases · 36 modules</span>
             <span class="pg-demo-meta">demo mode</span>
           </div>
           <div class="pg-demo-body">
@@ -180,14 +180,15 @@
     <circle cx="200" cy="60" r="22" fill="none" stroke="#f97316" stroke-width="1" opacity="0.45"/>
     <circle cx="200" cy="60" r="5" fill="#f97316"/>
   </svg>
-  <span class="project-thumb-label">MITRE × 31 · STIX 2.1</span>
+  <span class="project-thumb-label">MITRE × 26 · STIX 2.1</span>
 </div>
           <div>
             <h3>PhishGuard Pro</h3>
-            <p class="project-desc">Automated phishing email analysis with <strong style="color:var(--text-primary)">25 modules</strong> across 6 phases — including modern-threat detection (BitB, AiTM, OAuth consent phishing, phishing kit fingerprinting), MITRE ATT&amp;CK mapping for 31 techniques, and STIX 2.1 export for SIEM/SOAR integration.</p>
+            <p class="project-desc">Automated phishing email analysis with <strong style="color:var(--text-primary)">36 modules</strong> across 7 phases — including modern-threat detection (BitB, AiTM, ClickFix, HTML smuggling, device-code and OAuth consent phishing, reply-chain hijacking, phishing-kit fingerprinting), MITRE ATT&amp;CK mapping for 26 techniques, and STIX 2.1 export for SIEM/SOAR integration. Covered by 504 tests.</p>
             <div class="tag-row">
               <span class="tag">Python</span><span class="tag">Flask</span><span class="tag">SQLite</span>
               <span class="tag">Claude API</span><span class="tag">MITRE ATT&amp;CK</span><span class="tag">STIX 2.1</span>
+              <span class="tag">pytest</span>
             </div>
             <a class="project-link" href="phishguard.html">Read case study</a>
           </div>
@@ -260,7 +261,7 @@
           <ul>
             <li>Performed alert triage and incident analysis in Microsoft 365 Defender (XDR), improving MTTD by escalating critical incidents 30% faster than baseline.</li>
             <li>Led containment and remediation actions and post-incident documentation, reducing average incident resolution time by 25%.</li>
-            <li>Built an N8n + OpenVAS workflow that runs monthly scans, generates reports, and alerts stakeholders — saving 15 hours of manual work per month.</li>
+            <li>Automated the monthly external vulnerability scan for two client domains — prototyped in N8n, then rebuilt as a tested Python pipeline (Sublist3r + crt.sh + HackerTarget discovery → OpenVAS) that runs hands-free and alerts on new hosts — saving 15 hours of manual work per month.</li>
             <li>Created an automated phishing email triage pipeline (IOC extraction → threat-intel reporting) that cut phishing investigation time by 40%.</li>
             <li>Increased Microsoft Secure Score by 12 points over 6 months by tracking metrics and implementing recommended controls.</li>
             <li>Verified admin-rights restrictions across 80+ endpoints (CIS Controls / least-privilege) and resolved 1000+ cross-functional security tickets.</li>

@@ -777,8 +777,8 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   gap: 12px;
   margin-top: 24px;
 }
-@media (min-width: 768px) { .pipeline { grid-template-columns: repeat(3, 1fr); } }
-@media (min-width: 1024px) { .pipeline { grid-template-columns: repeat(6, 1fr); } }
+@media (min-width: 768px) { .pipeline { grid-template-columns: repeat(4, 1fr); } }
+@media (min-width: 1024px) { .pipeline { grid-template-columns: repeat(7, 1fr); } }
 .phase {
   padding: 16px 14px;
   background: var(--bg-card);
@@ -786,6 +786,7 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   border-left: 2px solid var(--primary);
   border-radius: var(--radius-sm);
   position: relative;
+  align-self: start;
 }
 .phase .phase-num {
   font-family: var(--font-mono);
@@ -801,7 +802,7 @@ section + section { border-top: 1px solid rgba(30, 58, 82, 0.4); }
   font-size: 11px;
   color: var(--text-dim);
 }
-.phase li { padding: 2px 0; }
+.phase li { padding: 2px 0; overflow-wrap: anywhere; }
 
 .module-card {
   padding: 20px;
